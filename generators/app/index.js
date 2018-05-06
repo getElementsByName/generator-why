@@ -31,7 +31,9 @@ class WebpackGenerator extends Generator {
         if (fs.existsSync(packagejsonPath)) {
             this._isPackagejsonCreated = false
         } else {
-            const dummyPackageJson = DummyPackageJson.getJSON({name: this.templateData.project.name});
+            const dummyPackageJson = DummyPackageJson.getJSON({
+                name: this.templateData.project.name
+            });
             const dummyPackageJsonString = JSON.stringify(dummyPackageJson, null, 2);
 
             fs.writeFileSync(packagejsonPath, dummyPackageJsonString);
@@ -44,25 +46,34 @@ class WebpackGenerator extends Generator {
         const projectNamePrompt = PromptConfig.projectName;
         projectNamePrompt.default = this._getCurrentFolderName();
 
-        return this.prompt([projectNamePrompt, PromptConfig.projectTypeList]).then(({projectName, projectType}) => {
+        return this.prompt([projectNamePrompt, PromptConfig.projectTypeList]).then(({
+            projectName,
+            projectType
+        }) => {
             this.templateData.setProjectName(projectName);
 
             if (projectType) {
-                return {projectType};
-            } else {    // 직접 입력인 경우
+                return {
+                    projectType
+                };
+            } else { // 직접 입력인 경우
                 return this.prompt([PromptConfig.projectTypeGeneral]);
             }
-        }).then(({projectType}) => {
+        }).then(({
+            projectType
+        }) => {
             this.templateData.project.type = projectType;
 
             // TODO: 하드코딩 되어 있는 부분 일반화 시키기
-            const searchPromptInfo =  PromptConfig.projectTypeExtraPrompt[0];
+            const searchPromptInfo = PromptConfig.projectTypeExtraPrompt[0];
             const targetProjectType = searchPromptInfo.test.project.type;
             const containerName = searchPromptInfo.containerName;
             const promptList = searchPromptInfo.promptList;
 
             if (projectType.includes(targetProjectType)) {
-                return this.prompt(promptList).then(({answer})=>{
+                return this.prompt(promptList).then(({
+                    answer
+                }) => {
                     return {
                         containerName,
                         answer
@@ -71,11 +82,13 @@ class WebpackGenerator extends Generator {
             } else {
                 return {};
             }
-        }).then(({answer, containerName}) => {
+        }).then(({
+            answer,
+            containerName
+        }) => {
             if (answer) {
                 // TODO: 추가 container에 namespace 정의하도록 변경 필요
-                this.templateData.project.namespaceList
-                    = answer.namespaceList.concat([this.templateData.project.name.camel]);
+                this.templateData.project.namespaceList = answer.namespaceList.concat([this.templateData.project.name.camel]);
 
                 this.templateData[containerName] = answer.search;
             }
@@ -111,11 +124,13 @@ class WebpackGenerator extends Generator {
     }
 
     writing() {
-        const remoteURL = projectTemplate.getRemoteURL({branchName: this.templateData.project.type});
+        const remoteURL = projectTemplate.getRemoteURL({
+            branchName: this.templateData.project.type
+        });
         console.log(`1. fetch project template from remote (${remoteURL})`);
         return this._installNpm(remoteURL).then(() => {
 
-            if (this._isPackagejsonCreated) {   // 초기에 package.json이 이미 있었던 경우는 유지
+            if (this._isPackagejsonCreated) { // 초기에 package.json이 이미 있었던 경우는 유지
                 // 	// git remote template을 설치하기 위한 package.json 제거
                 fs.unlink(this.destinationPath("package.json"));
             }
@@ -128,9 +143,11 @@ class WebpackGenerator extends Generator {
             this.fs.copyTpl(
                 this.templatePath(),
                 this.destinationPath(),
-                tplData,
-                {},
-                {globOptions: {dot: true}}
+                tplData, {}, {
+                    globOptions: {
+                        dot: true
+                    }
+                }
             );
 
             this._renameFiles();
@@ -143,10 +160,9 @@ class WebpackGenerator extends Generator {
         return this.installDependencies({
             npm: true,
             bower: false,
-            yarn: false,
-            callback: () => {
-                console.log(`\nDone!! Run by 'npm start'`);
-            }
+            yarn: false
+        }).then(() => {
+            console.log(`\nDone!! Run by 'npm start'`);
         });
     }
 }
