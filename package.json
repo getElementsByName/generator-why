@@ -1,0 +1,15 @@
+{
+  "name": "generator-why",
+  "version": "1.0.0",
+  "description": "yoman generator",
+  "keywords": [],
+  "author": {
+    "name": "Wonhong Yoo",
+    "email": "korywh@gmail.com"
+  },
+  "repository": "https://github.com/getElementsByName/generator-why",
+  "license": "MIT",
+  "dependencies": {
+    "yeoman-generator": "^2.0.5"
+  }
+}
